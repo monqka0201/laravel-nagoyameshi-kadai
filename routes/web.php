@@ -19,10 +19,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// 管理者用
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
     Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
-});
-require __DIR__.'/auth.php';
 
-Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
-Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
+    // 管理者専用ユーザー一覧・詳細ページ
+    Route::get('users',[UserController::class, 'index'])->name('users.index');
+    Route::get('users/{id}', [UserController::class, 'show'])->name('users.show');
+});
+
+require __DIR__.'/auth.php';

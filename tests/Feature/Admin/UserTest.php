@@ -24,7 +24,7 @@ class UserTest extends TestCase
 
         // 302リダイレクト（ログインページへ）を期待
         $response->assertStatus(302);
-        $response->assertRedirect(route('login')); 
+        $response->assertRedirect(route('admin.login')); 
     }
 
     /**
@@ -37,7 +37,7 @@ class UserTest extends TestCase
      {
         // 一般ユーザーでログイン
         $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
         // 一般ユーザーで管理者ページにアクセス
         $response = $this->get(route('admin.users.index'));
@@ -79,7 +79,7 @@ class UserTest extends TestCase
 
         // 302リダイレクト（ログインページ）へ期待
         $response->assertStatus(302);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('admin.login'));
       }
 
       /**
@@ -111,11 +111,11 @@ class UserTest extends TestCase
     public function test_logged_in_admin_can_access_admin_users_show_page()
     {
         // 管理者でログイン
-        $admin = User::factory()->create(['is_admin' => true]);  // 管理者を作成
+        $admin = Admin::factory()->create(['is_admin' => true]);  // 管理者を作成
         $this->actingAs($admin);
 
         // ユーザーを作成
-        $user = User::factory()->create();
+        $user = Admin::factory()->create();
 
         // 管理者として会員詳細ページにアクセス
         $response = $this->get(route('admin.users.show', $user));
