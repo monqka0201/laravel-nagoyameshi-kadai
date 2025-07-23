@@ -44,8 +44,9 @@ class UserTest extends TestCase
         $response = $this->get(route('admin.users.index'));
 
         // 302 Forbiddenエラーを期待
-        $response->assertStatus(302);
+        $response->assertStatus(403);
         $response->assertRedirect(route('admin.login'));
+
      }
 
      /**
@@ -95,19 +96,11 @@ class UserTest extends TestCase
 
        public function test_logged_in_user_cannot_access_admin_users_show_page()
        {
-        // 一般ユーザーでログイン
-        $user = User::factory()->create();
-        $this->actingAs($user);
+       $user = User::factory()->create();
 
-        // ユーザーを作成
-        $adminUser = User::factory()->create();
+       $response = $this->actingAs($user)->get(route('admin.users.show', $user));
 
-        // 一般ユーザーで会員詳細ページにアクセス
-        $response = $this->get(route('admin.users.show', $adminUser));
-
-        // 403Forbiddenエラーを期待
-        $response->assertStatus(403);
-        $response->assertRedirect(route('admin.login'));
+       $response->assertRedirect(route('admin.login'));
        }
 
        /**

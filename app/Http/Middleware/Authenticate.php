@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class Authenticate extends Middleware
 {
@@ -12,9 +13,17 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        if ($request->is('admin') || $request->is('admin/*')){
+        // admin用ルートへのアクセス
+        if($request->is('admin/*')){
+            if(Auth::guard('web')->check()){
+                abort(403);
+            }
+
+            // 未ログインならadminログインへリダイレクト
             return route('admin.login');
         }
+
+        // 通常ルートへのみログイン時
         return $request->expectsJson() ? null : route('login');
     }
 }
