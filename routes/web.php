@@ -19,11 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-require __DIR__.'/auth.php';
-
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
     Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
 });
+require __DIR__.'/auth.php';
 
-Route::get('admin/users', [UserController::class, 'index'])->name('users.index');
-Route::get('admin/users/{id}', [UserController::class, 'show'])->name('users.show');
+Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
