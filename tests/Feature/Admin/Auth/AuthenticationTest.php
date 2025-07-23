@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Auth;
 
+use App\Models\User;
 use App\Models\Admin;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Hash;
@@ -33,7 +34,7 @@ class AuthenticationTest extends TestCase
             'password' => 'nagoyameshi',
         ]);
 
-        $this->assertTrue(Auth::guard('admin')->check());
+        $this->assertAuthenticatedAs($admin, 'admin');
         $response->assertRedirect(RouteServiceProvider::ADMIN_HOME);
     }
 

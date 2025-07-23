@@ -3,8 +3,10 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -23,8 +25,7 @@ class UserTest extends TestCase
         $response = $this->get(route('admin.users.index'));
 
         // 302リダイレクト（ログインページへ）を期待
-        $response->assertStatus(302);
-        $response->assertRedirect(route('admin.login')); 
+        $response->assertStatus(302); $response->assertRedirect(route('admin.login'));
     }
 
     /**
@@ -42,8 +43,9 @@ class UserTest extends TestCase
         // 一般ユーザーで管理者ページにアクセス
         $response = $this->get(route('admin.users.index'));
 
-        // 403 Forbiddenエラーを期待
-        $response->assertStatus(403);
+        // 302 Forbiddenエラーを期待
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.login'));
      }
 
      /**
@@ -54,8 +56,11 @@ class UserTest extends TestCase
       public function test_logged_in_admin_can_access_admin_users_index_page()
       {
         // 管理者でログイン
-        $admin = User::factory()->create(['is_admin' => true]);
-        $this->actingAs($admin);
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+        $this->actingAs($admin, 'admin');
 
         // 管理者として会員一覧ページにアクセス
         $response = $this->get(route('admin.users.index'));
@@ -102,6 +107,7 @@ class UserTest extends TestCase
 
         // 403Forbiddenエラーを期待
         $response->assertStatus(403);
+        $response->assertRedirect(route('admin.login'));
        }
 
        /**
@@ -111,11 +117,11 @@ class UserTest extends TestCase
     public function test_logged_in_admin_can_access_admin_users_show_page()
     {
         // 管理者でログイン
-        $admin = Admin::factory()->create(['is_admin' => true]);  // 管理者を作成
-        $this->actingAs($admin);
+        $admin = User::factory()->create(['is_admin' => true]);  // 管理者を作成
+        $this->actingAs($admin, 'admin');
 
         // ユーザーを作成
-        $user = Admin::factory()->create();
+        $user = User::factory()->create();
 
         // 管理者として会員詳細ページにアクセス
         $response = $this->get(route('admin.users.show', $user));
