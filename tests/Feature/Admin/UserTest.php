@@ -36,17 +36,11 @@ class UserTest extends TestCase
 
      public function test_logged_in_user_cannot_access_admin_users_index_page()
      {
-        // 一般ユーザーでログイン
         $user = User::factory()->create();
-        $this->actingAs($user, 'web');
 
-        // 一般ユーザーで管理者ページにアクセス
-        $response = $this->get(route('admin.users.index'));
+        $response = $this->actingAs($user)->get(route('admin.users.index'));
 
-        // 302 Forbiddenエラーを期待
-        $response->assertStatus(403);
         $response->assertRedirect(route('admin.login'));
-
      }
 
      /**

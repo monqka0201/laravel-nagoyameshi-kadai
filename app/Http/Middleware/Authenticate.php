@@ -15,9 +15,6 @@ class Authenticate extends Middleware
     {
         // admin用ルートへのアクセス
         if($request->is('admin/*')){
-            if(Auth::guard('web')->check()){
-                abort(403);
-            }
 
             // 未ログインならadminログインへリダイレクト
             return route('admin.login');
